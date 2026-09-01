@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import math
 
 capture = cv2.VideoCapture(0)
 
@@ -17,15 +18,11 @@ while True:
 
     mask = cv2.inRange(hsv, lower_blue, upper_blue)
 
-    img = cv2.bitwise_and(frame, frame, mask=mask)
-
     contours, hierarchy = cv2.findContours(
         mask,
         cv2.RETR_EXTERNAL,
         cv2.CHAIN_APPROX_SIMPLE
     )
-
-    #cv2.drawContours(frame, contours, -1, (0, 255, 0), 3)
 
     for c in contours:
         area = cv2.contourArea(c)
@@ -44,36 +41,12 @@ while True:
                 # (coordenadas), w, h, angle = box
                 # Se função, poderia desempacotar e retornar aqui
 
-                corners = np.int32(c)
-
-                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-                corners = cv2.goodFeaturesToTrack(
-                    gray,
-                    100,
-                    1.0,
-                    0.01,
-                    mask
-                )
-                
-                #for i in corners:
-                   # x, y = i.ravel()
-
-                    #cv2.line(
-                     #   frame,
-                      #  x,
-                    #    y,
-                   #     (255, 0, 0),
-                   #     thickness=1,
-                   #     lineType=cv2.LINE_8,
-                   #     shift=0
-                   # )
-                
+            
                 cv2.drawContours(
                     frame,
                     [box],
                     0,
-                    (0, 0, 255),
+                    (0, 255, 255),
                     2
                 )
 
@@ -84,6 +57,13 @@ while True:
                         area
                     )
                 )
+                angle = rect[-1]
+                print(angle)
+
+                angle_r = math.radians(angle)
+                x2 = int(cx + 100 * math.cos(angle_r))
+                y2 = int(cy + 100 * math.sin(angle_r))
+                cv2.line(frame,(cx,cy), (x2,y2), (0,255,0), 3)
 
     cv2.imshow("Webcam", frame)
 
