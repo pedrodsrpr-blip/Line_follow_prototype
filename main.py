@@ -31,16 +31,19 @@ while True:
             M = cv2.moments(c)
 
             if M["m00"] != 0:
-                cx = int(M["m10"] / M["m00"])
-                cy = int(M["m01"] / M["m00"])
+                centrox = int(M["m10"] / M["m00"])
+                centroy = int(M["m01"] / M["m00"])
 
                 rect = cv2.minAreaRect(c)
                 box = cv2.boxPoints(rect)
                 box = np.int64(box)
+                p1,p2,p3,p4 = box ##pode usar pra linha
 
-                # (coordenadas), w, h, angle = box
-                # Se função, poderia desempacotar e retornar aqui
-
+                (cx, cy), (w, h), angle = rect
+                if w>h:
+                    angle += 90
+                elif w<h:
+                    angle+= 90
             
                 cv2.drawContours(
                     frame,
@@ -51,19 +54,13 @@ while True:
                 )
 
                 print(
-                    "Blue found at: {},{} with area of: {}".format(
+                    "Blue found at: {},{} with area of: {} and angle of {}".format(
                         cx,
                         cy,
-                        area
+                        area,
+                        angle
                     )
                 )
-                angle = rect[-1]
-                print(angle)
-
-                angle_r = math.radians(angle)
-                x2 = int(cx + 100 * math.cos(angle_r))
-                y2 = int(cy + 100 * math.sin(angle_r))
-                cv2.line(frame,(cx,cy), (x2,y2), (0,255,0), 3)
 
     cv2.imshow("Webcam", frame)
 
